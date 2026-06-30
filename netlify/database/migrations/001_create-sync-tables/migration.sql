@@ -1,7 +1,4 @@
--- Reference schema. The function creates these automatically via ensureSchema();
--- this file is here for documentation and manual inspection.
-
-CREATE TABLE IF NOT EXISTS processed_sites (
+CREATE TABLE processed_sites (
   site_id       TEXT PRIMARY KEY,
   name          TEXT NOT NULL,
   custom_domain TEXT,
@@ -9,7 +6,7 @@ CREATE TABLE IF NOT EXISTS processed_sites (
   processed_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS sync_meta (
+CREATE TABLE sync_meta (
   key   TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );

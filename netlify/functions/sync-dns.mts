@@ -8,17 +8,16 @@
 import type { Config } from "@netlify/functions";
 import { NetlifyApi } from "../../lib/netlify-api";
 import {
-  ensureSchema,
   getProcessedIds,
   hasSeeded,
   markProcessed,
   markSeeded,
 } from "../../lib/db";
 
-export default async (): Promise<Response> => {
-  const token = process.env.NETLIFY_API_TOKEN;
-  const accountSlug = process.env.NETLIFY_ACCOUNT_SLUG;
-  const baseDomain = process.env.BASE_DOMAIN;
+export default async (): Promise<void> => {
+  const token = Netlify.env.get("NETLIFY_API_TOKEN");
+  const accountSlug = Netlify.env.get("NETLIFY_ACCOUNT_SLUG");
+  const baseDomain = Netlify.env.get("BASE_DOMAIN");
 
   if (!token || !accountSlug || !baseDomain) {
     throw new Error(
@@ -27,7 +26,6 @@ export default async (): Promise<Response> => {
   }
 
   const api = new NetlifyApi(token);
-  await ensureSchema();
 
   // Precondition: the base domain must be covered by a Netlify-managed DNS zone,
   // otherwise PUT /sites/{id}/dns sets a custom domain that never resolves.
@@ -51,7 +49,7 @@ export default async (): Promise<Response> => {
     }
     await markSeeded();
     console.log(`First run: seeded ${sites.length} existing site(s); none modified.`);
-    return new Response(`seeded ${sites.length}`, { status: 200 });
+    return;
   }
 
   const processed = await getProcessedIds();
@@ -77,8 +75,6 @@ export default async (): Promise<Response> => {
       console.error(`Failed for "${site.name}" (${site.id}):`, err);
     }
   }
-
-  return new Response(`processed ${newSites.length}`, { status: 200 });
 };
 
 // Runs every minute for TESTING. For production, dial this back (e.g. "*/15 * * * *").

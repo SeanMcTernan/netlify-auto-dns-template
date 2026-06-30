@@ -30,8 +30,11 @@ There is no "site created" webhook in the Netlify API, so detection is poll-and-
 ```bash
 npm install
 netlify link            # link to the customer's Netlify team/site
-netlify db init         # provision Netlify DB (Neon); injects NETLIFY_DATABASE_URL
 ```
+
+Netlify DB is provisioned automatically (the `@netlify/database` dependency + a
+deploy or `netlify dev` is all it takes â€” no manual database setup, no connection
+string). The schema is applied from `netlify/database/migrations/` on deploy.
 
 Set the three config values (locally in `.env`, in production via the Netlify UI or CLI):
 
@@ -70,7 +73,7 @@ It ships at **every minute** for testing. **Before production, dial it back** â€
 | `NETLIFY_API_TOKEN` | Personal Access Token (Bearer auth) for the Open API. |
 | `NETLIFY_ACCOUNT_SLUG` | Team slug whose sites are watched. |
 | `BASE_DOMAIN` | Domain new sites are placed under. Must be a Netlify-managed DNS zone. |
-| `NETLIFY_DATABASE_URL` | Set automatically by `netlify db init`. Don't set by hand. |
+| _(database connection)_ | Provisioned + injected automatically by `@netlify/database`. Nothing to set. |
 
 ## Safety
 
@@ -81,10 +84,10 @@ It ships at **every minute** for testing. **Before production, dial it back** â€
 ## Layout
 
 ```
-netlify/functions/sync-dns.mts   scheduled fn: discover -> diff -> assign
-lib/netlify-api.ts               Open API client (Bearer token)
-lib/db.ts                        Netlify DB (Neon) state helpers
-db/schema.sql                    reference schema (auto-created at runtime)
-netlify.toml                     functions config
-.env.example                     config template
+netlify/functions/sync-dns.mts                     scheduled fn: discover -> diff -> assign
+lib/netlify-api.ts                                 Open API client (Bearer token)
+lib/db.ts                                          Netlify DB state helpers (@netlify/database)
+netlify/database/migrations/001_create-sync-tables  schema, applied on deploy
+netlify.toml                                       functions config
+.env.example                                       config template
 ```
