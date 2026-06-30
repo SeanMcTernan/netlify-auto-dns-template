@@ -11,7 +11,7 @@ wires up the DNS records in your Netlify-managed zone — no manual step.
 
 A scheduled Netlify Function runs on a cron and:
 
-1. Lists every site on the team — `GET /accounts/{slug}/sites` (paginated).
+1. Lists every site on the team — `GET /{slug}/sites` (paginated; no `/accounts/` prefix).
 2. Diffs against the `processed_sites` table in **Netlify DB** (Neon Postgres) to find sites it hasn't seen.
 3. For each new site: `PATCH /sites/{id}` to set `custom_domain = {site.name}.{BASE_DOMAIN}`, then `PUT /sites/{id}/dns` to create the DNS records.
 4. Records the result so each site is handled once.

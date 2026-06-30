@@ -46,8 +46,10 @@ export class NetlifyApi {
     const perPage = 100;
     let page = 1;
     for (;;) {
+      // Note: the account-scoped sites endpoint is /{account_slug}/sites — there
+      // is NO /accounts/ prefix here (unlike /accounts for listing accounts).
       const res = await this.request(
-        `/accounts/${accountSlug}/sites?page=${page}&per_page=${perPage}`,
+        `/${accountSlug}/sites?page=${page}&per_page=${perPage}`,
       );
       const batch = (await res.json()) as NetlifySite[];
       all.push(...batch);
